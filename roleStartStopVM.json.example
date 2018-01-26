@@ -1,0 +1,21 @@
+{
+  "Name": "VM Start Stop Restart only",
+  "Id": "cadb4a5a-4e7a-47be-84db-05cad13b6769",
+  "IsCustom": true,
+  "Description": "Can monitor and restart virtual machines.",
+  "Actions": [
+    "Microsoft.Compute/virtualMachines/*/read",
+    "Microsoft.Compute/virtualMachines/deallocate/action", 
+    "Microsoft.Compute/virtualMachines/read",
+    "Microsoft.Compute/virtualMachines/restart/action",
+    "Microsoft.Compute/virtualMachines/start/action",
+    "Microsoft.Authorization/*/read",
+    "Microsoft.Compute/locations/*"
+  ],
+  "NotActions": [
+
+  ],
+  "AssignableScopes": [
+    "/subscriptions/00000000-0000-0000-0000-000000000000"
+  ]
+}

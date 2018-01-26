@@ -129,15 +129,65 @@ az storage account create -n mystorage192837465 \
     --sku Standard_LRS
 ```
 
-Go back to PC where limited user is logged in and check that we can read and regenerate storage keys, but cannot modify or delete storage account.
+Go back to PC where limited user is logged in and check that we can read and regenerate storage keys, but cannot modify or delete storage account. At the same time you should not be able to delete this account.
 
 ```
 az storage account keys list -g rg-blue -n mystorage192837465
 az storage account keys renew -g rg-blue -n mystorage192837465
+az storage account delete -g rg-blue -n mystorage192837465
 ```
 
 ## Fine grained access control with custom roles
-TBD
+Suppose we have special need for access control that does not fit any built-on role. For example we want to get role definition that allows user to start, stop and restart VMs, but cannot do anything else with it (this is close to built-in Virtual Machine Contributor, but more restricted).
+
+When defining custom roles we need to provide list of actions that reflects paths in Azure Resource Manager. You can use wildcards to provide access to complete subtree (for example all Compute related APIs) and also specify full access or read only. In our case we want to allow read on virtual machine resource, but only start, restart and stop (deallocate) actions are allowed. 
+
+Check roleStartStopVM.json.example and modify subscription ID to reflect your environment. This is to define where this definition is visible (it does not mean you need to assign it then on the some scope, it can be subset).
+
+Create custom definition.
+
+```
+az role definition create --role-definition @roleStartStopVM.json
+```
+
+Now - in cloud shell create VM in blue resource group.
+
+```
+az vm create -n myVirtualMachine -g rg-blue \
+    --image UbuntuLTS \
+    --public-ip-address "" \
+    --nsg "" \
+    --admin-username tomas \
+    --admin-password Azure12345678 \
+    --authentication-type password
+```
+
+Once VM is up and running go to your PC where limited user is logged in and try to stop this VM. This should fail because currently you are only Reader on this resource group.
+
+```
+az vm deallocate -n myVirtualMachine -g rg-blue
+```
+
+Let's assign our user custom role we have created before (in cloud shell).
+
+```
+export rgblue=$(az group show -n rg-blue --query id -o tsv)
+az role assignment create --role "VM Start Stop Restart only" \
+    --assignee "http://myLimitedAccount" \
+    --scope $rgblue
+```
+
+Now let's try again from PC with limited account logged in.
+
+```
+az vm deallocate -n myVirtualMachine -g rg-blue
+```
+
+This was successful. Make sure you are not able to do other actions such as delete this VM.
+
+```
+az vm delete -n myVirtualMachine -g rg-blue -y
+```
 
 ## Privileged Identity Management with just-in-time access
 TBD
