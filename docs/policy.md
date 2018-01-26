@@ -171,10 +171,11 @@ az policy definition create -n approvedImagesOnly \
 With our stored array of custom images IDs we can assign policy to resource group "policy".
 
 ```
+export params=$(echo '{"imageIds":{"value":'$images'}}')
 az policy assignment create -n approvedImagesOnly-rg-policy \
     --display-name "Approved images only in resource group" \
     --policy approvedImagesOnly \
-    --params {'imageIds': {'value': '$images'}}" \
+    --params "$params" \
     --resource-group policy \
     --sku free
 ```
@@ -182,5 +183,32 @@ az policy assignment create -n approvedImagesOnly-rg-policy \
 We can now test creating VM with unapproved vs. approved image
 
 ```
-az vm create -n myVM -g policy --image UbuntuLTS
+az vm create -n myUnapprovedVM -g policy \
+    --image UbuntuLTS \
+    --tags environment=dev organization=finance contact='tomas@mydomain.com' \
+    --public-ip-address "" \
+    --vnet-name myNet \
+    --subnet sub1 \
+    --nsg "" \
+    --admin-username tomas \
+    --admin-password Azure12345678 \
+    --authentication-type password
+
+The template deployment failed because of policy violation. Please see details for more information.
+```
+
+As we should see deployment violates policy and is failing. Let's try with approved image.
+
+```
+export imageId=$(az image show -n muj-linux-image -g muj-image-katalog --query id -o tsv)
+az vm create -n myApprovedVM -g policy \
+    --image $imageId \
+    --tags environment=dev organization=finance contact='tomas@mydomain.com' \
+    --public-ip-address "" \
+    --vnet-name myNet \
+    --subnet sub1 \
+    --nsg "" \
+    --admin-username tomas \
+    --admin-password Azure12345678 \
+    --authentication-type password
 ```
