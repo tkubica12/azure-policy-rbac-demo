@@ -1,0 +1,9 @@
+{
+  "imageIds": {
+    "metadata": {
+      "description": "The list of allowed image IDs",
+      "displayName": "Allowed image IDs"
+    },
+    "type": "Array"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "subnetId": {
+    "metadata": {
+      "description": "Subnet IDs to lock interfaces to",
+      "displayName": "Subnet IDs"
+    },
+    "type": "Array"
+  }
+}

@@ -1,0 +1,33 @@
+{
+    "if": {
+        "allOf": [
+            {
+                "not": {
+                    "field": "tags.environment",
+                    "in": [
+                        "dev",
+                        "test",
+                        "prod"
+                    ]
+                }
+            },
+            {
+                "not": {
+                    "field": "tags.organization",
+                    "in": [
+                        "it",
+                        "finance",
+                        "marketing"
+                    ]
+                }
+            },
+            {
+                "field": "tags.contact",
+                "exists": true
+            }
+        ]
+    },
+    "then": {
+        "effect": "deny"
+    }
+}

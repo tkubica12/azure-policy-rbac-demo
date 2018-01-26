@@ -1,0 +1,9 @@
+{
+  "if": {
+    "field": "type",
+    "in": "[parameters('listOfResourceTypesDenied')]"
+  },
+  "then": {
+    "effect": "deny"
+  }
+}

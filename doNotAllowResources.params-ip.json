@@ -1,0 +1,7 @@
+{
+  "listOfResourceTypesDenied": {
+    "value": [
+      "Microsoft.Network/publicIPAddresses"
+    ]
+  }
+}
