@@ -190,8 +190,48 @@ az vm delete -n myVirtualMachine -g rg-blue -y
 ```
 
 ## Privileged Identity Management with just-in-time access
-TBD
+In previous demo we have used account with full access to manage rights for our limited account. Azure AD Privileged Identity Management can provide sophisticated workflow around the same principles such as:
+- One-time rights escalation: ordinary user with limited rights can get privileged access on just-in-time bases for limited time; typical example is person handling service ticket, administrator assigned for planned maintenance etc.
+- Every rights escalation request is properly audited
+- You can define approval workflow, for example IT manager has to approve request for read/write escalation for contractor account
+
+Azure AD PIM is managed in Azure Portal and is not shown in this demo.
 
 ## Managed Service Identity for automation bots
-TBD
+Often there is need for something like service account - identity that is not bound to specific user as it is used by automation robot (such as Ansible or Terraform), Bash or PowerShell script or application accessing cloud resources such as SQL database, Key Vault with secrets or Service Bus for messaging. It is bad practice to include any credentials in code or stored in easily accessible files, but generation and delivery of proper credentials manualy can be painful. Azure Managed Service Identity automates this process by automatically creating identity for your VM so you can access certain Azure services from this VM without hardcoding any credentials.
 
+We are going to create new VM and assign Managed Service Identity. We will use role Contributor and scope its rights only to resource msitest (for example if you deploy automation tool such as Terraform you might want to scope MSI to whole subscription).
+
+```
+az group create -n msitest -l westeurope
+az group show -n msitest --query [].id -o tsv
+az vm create -n exampleVM \
+    -g msitest \
+    --image UbuntuLTS \
+    --public-ip-address-dns-name msitest192837 \
+    --admin-username tomas \
+    --admin-password Azure12345678 \
+    --authentication-type password \
+    --assign-identity \
+    --role Contributor \
+    --scope $(az group show -n msitest --query id -o tsv)
+```
+
+Let's connect to VM.
+
+```
+ssh tomas@msitest192837.westeurope.cloudapp.azure.com
+```
+
+We can install Azure CLI and login using Managed Service Identity. We should see resources in msitest resource group and can create some new.
+
+```
+echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ wheezy main" | \
+     sudo tee /etc/apt/sources.list.d/azure-cli.list
+sudo apt-key adv --keyserver packages.microsoft.com --recv-keys 52E16F86FEE04B979B07E28DB02C46DF417A0893
+sudo apt-get install apt-transport-https -y
+sudo apt-get update && sudo apt-get install azure-cli -y
+
+az login --msi
+az resource list -o table
+```
