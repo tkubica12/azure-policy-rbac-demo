@@ -7,6 +7,13 @@
     - [Managed Service Identity for automation bots](#managed-service-identity-for-automation-bots)
 
 # Role Based Access Control
+Azure RBAC can be used to define access rights for individual users or service principals (service accounts). 
+
+**Roles** are definitions of types of resources, actions and read vs read/write that user with this role can access. There are many useful roles built-in including generic Owner, Contributor and Reader as well as resource specific such as Virtual Machine Contributor and many more. You can also define custom roles in which you list part of API tree you want to allow or forbid. As roles are handled on Azure Resource Manager level it is applied for all management types including portal, CLI, PowerShell, SDKs or APIs used by automation tools such as Terraform or Ansible.
+
+**Assignment** of users to roles is best handled with your identity management so by leveraging Security Groups in AD synchronized with AAD. You can also users directly without groups.
+
+**Scope** can be defined as whole subscription and assignments are inherited by lower level objects, but you can overide this on lower levels. Another typical scope is Resource Group, so user can become owner of his workload, can read and monitor other Resource Groups while might have no visibility into others. You can also lock scope to single individual resource.
 
 ## Prepare environment and create new account
 First we will create some resource groups to play with.
