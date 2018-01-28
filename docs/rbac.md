@@ -235,3 +235,22 @@ sudo apt-get update && sudo apt-get install azure-cli -y
 az login --msi
 az resource list -o table
 ```
+
+If you are using APIs and SDKs to access Azure Resource Manager directly from your code (such as Python script), you can access token yourself (note that you are not getting some user name and password that you could easily transfer outside of this VM - you are getting only time limited access token):
+
+```
+curl http://localhost:50342/oauth2/token --data "resource=https://management.azure.com/" -H Metadata:true
+```
+
+With this token we can now use REST API directly. For example this is how we can deallocate VM from within it - for example when VM finish some job it can deallocate itself so you stop paying for resources.
+
+```
+sudo apt install jq -y
+export token=$(curl -s http://localhost:50342/oauth2/token --data "resource=https://management.azure.com/" -H Metadata:true | jq -r ".access_token")
+export subscriptionId=$(cat ~/.azure/azureProfile.json | jq -r ".subscriptions[0].id")
+
+
+curl -X POST https://management.azure.com/subscriptions/$subscriptionId/resourceGroups/msitest/providers/Microsoft.Compute/virtualMachines/$(hostname)/deallocate?api-version=2017-12-01 -d "" -H "Authorization: Bearer $token"
+```
+
+With MSI account in Azure Active Directlory is created and you can use it for other purposes as well. For example with Azure SQL you can turn on AAD authentication and your MSI account can be used to access database.
