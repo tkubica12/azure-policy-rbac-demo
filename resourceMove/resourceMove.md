@@ -38,8 +38,10 @@ az group delete -n test-source -y --no-wait
 az group delete -n test-destination -y --no-wait
 az policy assignment delete -n moveTest-rg-policy --resource-group test-destination
 az policy definition delete -n moveTest
-
 ```
+
+Activity Log shows Deny on even initiate by Microsoft Azure Policy Insights, but only after resource has been moved.
+![](img1.png)
 
 ## Potential solutions and workarounds
 
@@ -48,7 +50,8 @@ Custom RBAC - proactive, but not complete, [details here](#custom-rbac)
 - Does not prevent writing resources that must be allowed, but some properties enforced (eg. enforced TLS on storage account, tag structure, audit logs enabled)
 - Require change on existing subscriptions by moving from Contributor role to custom role
 
-Ideas:
+More ideas:
+- test audit policy to be able to report on violations rather then deny
 - modify resource for policy to kick in
 - rewrite key policies to simple code and:
   - listen on change feed and generate alert using Functions or/and Logic Apps
