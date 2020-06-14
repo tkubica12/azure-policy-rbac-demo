@@ -1,0 +1,23 @@
+{
+    "if": {
+        "allOf": [
+            {
+                "field": "type",
+                "equals": "Microsoft.Sql/servers"
+            },
+            {
+                "field": "Microsoft.Sql/servers/publicNetworkAccess",
+                "exists": "false"
+            }
+        ]
+    },
+    "then": {
+        "effect": "append",
+        "details": [
+            {
+                "field": "Microsoft.Sql/servers/publicNetworkAccess",
+                "value": "Disabled"
+            }
+        ]
+    }
+}

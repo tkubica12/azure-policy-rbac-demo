@@ -1,9 +1,9 @@
 - [Azure Policy](#azure-policy)
-    - [Prepare testing resource group](#prepare-testing-resource-group)
-    - [Do not allow Public IP address to be created in resource group](#do-not-allow-public-ip-address-to-be-created-in-resource-group)
-    - [Make sure tagging is enforced](#make-sure-tagging-is-enforced)
-    - [Enforce specific subnet for VMs](#enforce-specific-subnet-for-vms)
-    - [Allow only selected custom VM images](#allow-only-selected-custom-vm-images)
+  - [Prepare testing resource group](#prepare-testing-resource-group)
+  - [Do not allow Public IP address to be created in resource group](#do-not-allow-public-ip-address-to-be-created-in-resource-group)
+  - [Make sure tagging is enforced](#make-sure-tagging-is-enforced)
+  - [Enforce specific subnet for VMs](#enforce-specific-subnet-for-vms)
+  - [Allow only selected custom VM images](#allow-only-selected-custom-vm-images)
 
 # Azure Policy
 Azure Policy is used to create policies on Azure Resource Manager level when creating or updating resources. As rules are defined on ARM level they do apply to all means of management including APIs (like when using Terraform, Ansible or Azure SDK), in Portal, via Azure CLI or PowerShell. Rules are enforced by checking ARM JSON structures to include or exclude certain fields and values. With that you can enforce pretty much any policy such as preventing certain resources to be created, limit list of available images for VMs, restrict networking such as specific subnet, user default routes, assignment of public IP address or enforce tagging schemas.
@@ -212,3 +212,4 @@ az vm create -n myApprovedVM -g policy \
     --admin-password Azure12345678 \
     --authentication-type password
 ```
+
