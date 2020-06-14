@@ -6,6 +6,41 @@ Consider managed subscription with Azure Policies in place defined by central te
 
 User can be contributor in both unmanaged and managed subscription and initiate movement of resources between subscriptions. During this proces Azure Policies in destination subscription are not checked/enforced creating security risks. One example is data exfiltration - managed subscription might be locked from accessing Internet without going throw NGFW/DLP platform. User can move VM with public Internet access (unmanaged VNET) to managed subscription, take disk from managed corporate VM, attach it to this unmanaged resource and copy data from disk to some endpoint in Internet.
 
+## Test environment
+```bash
+# Create two resource groups
+az group create -n test-source -l westeurope
+az group create -n test-destination -l westeurope
+
+# Create policy and assing to just one resource group
+az policy definition create -n moveTest \
+    --display-name "moveTest" \
+    --mode all \
+    --rules tagging.rules.json
+
+az policy assignment create -n moveTest-rg-policy \
+    --display-name "moveTest" \
+    --policy moveTest \
+    --resource-group test-destination \
+    --sku standard
+
+# Deploy non-compliant resource in RG with policy - FAIL
+az storage account create -n notagtest123 -g test-destination --tags badthing=true
+
+# Deploy non-compliant resource in RG withhout policy - PASS
+az storage account create -n notagtest123 -g test-source --tags badthing=true
+
+# Move non-compliant resource to RG with policy - PASS (not desired outcome, violates policy)
+az resource move --destination-group test-destination --ids $(az storage account show -n notagtest123 -g test-source --query id -o tsv)
+
+# Clean up
+az group delete -n test-source -y --no-wait
+az group delete -n test-destination -y --no-wait
+az policy assignment delete -n moveTest-rg-policy --resource-group test-destination
+az policy definition delete -n moveTest
+
+```
+
 ## Potential solutions and workarounds
 
 Custom RBAC - proactive, but not complete, [details here](#custom-rbac) 

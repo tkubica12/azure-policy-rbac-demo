@@ -1,0 +1,9 @@
+{
+    "if": {
+        "field": "tags.badthing",
+        "exists": true
+    },
+    "then": {
+        "effect": "deny"
+    }
+}
