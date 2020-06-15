@@ -50,13 +50,10 @@ Custom RBAC - proactive, but not complete, [details here](#custom-rbac)
 - Does not prevent writing resources that must be allowed, but some properties enforced (eg. enforced TLS on storage account, tag structure, audit logs enabled)
 - Require change on existing subscriptions by moving from Contributor role to custom role
 
-More ideas:
-- test audit policy to be able to report on violations rather then deny
-- modify resource for policy to kick in
-- rewrite key policies to simple code and:
-  - listen on change feed and generate alert using Functions or/and Logic Apps
-  - use scheduled jobs (Funcitons, Logic App or Automation script)
-- can change feed or activity log recognize move operation?
+Alert on policy violation - policy gets checked, but not enforced, so there is ability to react on it - [details here](#policy-alert) 
 
 ### Custom RBAC
+TBD
+
+### Policy Alert
 TBD
