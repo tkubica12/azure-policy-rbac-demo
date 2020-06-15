@@ -98,7 +98,18 @@ Connect Activity log to Log Analytics workspace so we can query events and find 
 
 ![](img3.png)
 
-TBD
+List failed policies with deny effect initiated not by user, but by compliance check engine (this will exclude resources blocked by deny policy).
+
+**Work in progress** - todo streamline output, deduplicate, test
+```
+AzureActivity
+| where OperationNameValue == "MICROSOFT.AUTHORIZATION/POLICIES/DENY/ACTION"
+| extend properties = parsejson(Properties)
+| where properties.category == "Policy" and properties.isComplianceCheck == "True"
+| where parsejson(tostring(properties.policies))[0].policyDefinitionEffect == "deny"
+```
+
+TBD - create alert
 
 ### Resource move visibility
 Resource move operation is visible in Activity Log as write operation. Connect Activity log to Log Analytics so we can query events and provide information such as resource moves over time, who initiate those, source, destination, statistics. For resource move we need Administrative log type.
