@@ -40,7 +40,7 @@ az policy assignment delete -n moveTest-rg-policy --resource-group test-destinat
 az policy definition delete -n moveTest
 ```
 
-Activity Log shows Deny on even initiate by Microsoft Azure Policy Insights, but only after resource has been moved.
+Activity Log shows Deny on even initiate by Microsoft Azure Policy Insights, but only after resource has been moved. This ex-post action does not prevent movement to happen, but flags resource as non-compliant so situation gets reported.
 ![](img1.png)
 
 ## Potential solutions and workarounds
@@ -50,10 +50,27 @@ Custom RBAC - proactive, but not complete, [details here](#custom-rbac)
 - Does not prevent writing resources that must be allowed, but some properties enforced (eg. enforced TLS on storage account, tag structure, audit logs enabled)
 - Require change on existing subscriptions by moving from Contributor role to custom role
 
-Alert on policy violation - policy gets checked, but not enforced, so there is ability to react on it - [details here](#policy-alert) 
+Visibility on policy violation - policy gets checked, but not enforced, so there is ability to react on it - [details here](#policy-visibility) 
+
+Visibility into resource move events via Activity Log and Workbook - [details here](#resource-move-visibility) 
 
 ### Custom RBAC
+Consider following scenario. There is enterprise networking setup forcing all communication via company firewall. No directl Internet access is allowed to prevent data exfiltration. Locks and policies prevent modification of existing resources or creating new VLAN. Do to policies not enforced on resource move, user can move in VNET and VM with no routes via firewall possible abusing company data (by connecting corporate disk to this VM). Let's create custom RBAC role that does no allow creating VNET and use that one rather that built-in Contributor.
+
 TBD
 
-### Policy Alert
+### Policy visibility
+Non-compliant resources will be blocked when created/updated in destination scope. Moved resource are not blocked, but flagged as non-compliant.
+
+![](img2.png)
+
+Connect Activity log to Log Analytics workspace so we can query events and find new policy violations so we can trigger alert on it.
+
 TBD
+
+### Resource move visibility
+Resource move operation is visible in Activity Log as write operation. Connect Activity log to Log Analytics so we can query events and provide information such as resource moves over time, who initiate those, source, destination, statistics.
+
+TBD
+
+We can also build Workbook on top to provide rich visualizations.
