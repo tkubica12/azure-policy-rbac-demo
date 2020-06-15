@@ -57,7 +57,37 @@ Visibility into resource move events via Activity Log and Workbook - [details he
 ### Custom RBAC
 Consider following scenario. There is enterprise networking setup forcing all communication via company firewall. No directl Internet access is allowed to prevent data exfiltration. Locks and policies prevent modification of existing resources or creating new VLAN. Do to policies not enforced on resource move, user can move in VNET and VM with no routes via firewall possible abusing company data (by connecting corporate disk to this VM). Let's create custom RBAC role that does no allow creating VNET and use that one rather that built-in Contributor.
 
-TBD
+limitedContributor.json contains custom role derived from Contributor, but deny creating or modifying resources such as VNET, UDR, VPN or Public IP while keeping read available (to be able to see and assign VM to).
+
+Deploy and test custom role.
+
+```bash
+# Deploy custom role
+az deployment sub create --template-file limitedContributor.json -l westeurope
+
+# Create test user (Service Principal)
+export client_secret=$(az ad sp create-for-rbac -n "http://testLimitedContributor" --skip-assignment --query password -o tsv)
+export client_id=$(az ad sp show --id "http://testLimitedContributor" --query appId -o tsv)
+export tenant_id=$(az ad sp show --id "http://testLimitedContributor" --query appOwnerTenantId -o tsv)
+
+# Assign limitedContributor role on subscription
+az role assignment create --assignee $client_id --role limitedContributor
+
+# Connect via SP
+az login --service-principal --username $client_id --password $client_secret --tenant $tenant_id
+
+# Creation of VNET should fail
+az group create -n test-rg -l westeurope
+az network vnet create -n mynet -g test-rg
+
+# Relogin as standard user
+az login
+
+# Clean up
+az group delete -n test-rg -y --no-wait
+az role assignment delete --assignee $client_id --role limitedContributor
+az ad sp delete --id "http://testLimitedContributor"
+```
 
 ### Policy visibility
 Non-compliant resources will be blocked when created/updated in destination scope. Moved resource are not blocked, but flagged as non-compliant.

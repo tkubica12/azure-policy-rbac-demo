@@ -1,0 +1,56 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.1",
+    "parameters": {
+    },
+    "variables": {
+        "customRoleGuid": "[guid(subscription().id)]"
+    },
+    "resources": [
+        {
+            "name": "[variables('customRoleGuid')]",
+            "type": "Microsoft.Authorization/roleDefinitions",
+            "apiVersion": "2017-09-01",
+            "properties": {
+                "roleName": "LimitedContributor",
+                "description": "Contributor without networking permissions",
+                "type": "CustomRole",
+                "permissions": [
+                    {
+                        "actions": [
+                            "*",
+                            "Microsoft.Network/virtualNetworks/*/read",
+                            "Microsoft.Network/publicIPAddresses/read",
+                            "Microsoft.Network/publicIPPrefixes/read"
+                        ],
+                        "notActions": [
+                            "Microsoft.Authorization/*/Delete",
+                            "Microsoft.Authorization/*/Write",
+                            "Microsoft.Authorization/elevateAccess/Action",
+                            "Microsoft.Blueprint/blueprintAssignments/write",
+                            "Microsoft.Blueprint/blueprintAssignments/delete",
+                            "Microsoft.Network/publicIPAddresses/write",
+                            "Microsoft.Network/publicIPPrefixes/write",
+                            "Microsoft.Network/routeTables/*",
+                            "Microsoft.Network/virtualNetworkGateways/*",
+                            "Microsoft.Network/virtualNetworks/*/write",
+                            "Microsoft.Network/virtualNetworks/*/delete",
+                            "Microsoft.Network/virtualNetworks/virtualNetworkPeerings/*",
+                            "Microsoft.Network/virtualWans/*",
+                            "Microsoft.Network/vpnGateways/*"
+                        ]
+                    }
+                ],
+                "assignableScopes": [
+                    "[subscription().Id]"
+                ]
+            }
+        }
+    ],
+    "outputs": {
+        "limitedContributorId": {
+            "type": "string",
+            "value": "[concat(subscription().Id, '/providers/Microsoft.Authorization/roleDefinitions/', variables('customRoleGuid'))]"
+        }
+    }
+}
