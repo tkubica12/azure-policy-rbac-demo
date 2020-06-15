@@ -105,6 +105,16 @@ Resource move operation is visible in Activity Log as write operation. Connect A
 
 ![](img4.png)
 
-TBD
+Here Kusto query to list move operations from destination perspective (resources in target location).
+
+```
+AzureActivity
+| where ActivityStatusValue == "Success"
+| where OperationNameValue endswith "/WRITE"
+| where parsejson(Authorization).action endswith "/moveResources/action"
+| project TimeGenerated, CallerIpAddress, Caller, ResourceName = extract(@"([^\/]*$)", 1, _ResourceId), ResourceGroup, SubscriptionId, ResourceProviderValue, _ResourceId
+```
+
+![](img5.png)
 
 We can also build Workbook on top to provide rich visualizations.
