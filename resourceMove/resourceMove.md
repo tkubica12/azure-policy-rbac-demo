@@ -64,12 +64,16 @@ Non-compliant resources will be blocked when created/updated in destination scop
 
 ![](img2.png)
 
-Connect Activity log to Log Analytics workspace so we can query events and find new policy violations so we can trigger alert on it.
+Connect Activity log to Log Analytics workspace so we can query events and find new policy violations so we can trigger alert on it. Type of log we are interested in is Policy.
+
+![](img3.png)
 
 TBD
 
 ### Resource move visibility
-Resource move operation is visible in Activity Log as write operation. Connect Activity log to Log Analytics so we can query events and provide information such as resource moves over time, who initiate those, source, destination, statistics.
+Resource move operation is visible in Activity Log as write operation. Connect Activity log to Log Analytics so we can query events and provide information such as resource moves over time, who initiate those, source, destination, statistics. For resource move we need Administrative log type.
+
+![](img4.png)
 
 TBD
 
