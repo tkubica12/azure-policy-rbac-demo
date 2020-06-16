@@ -112,7 +112,15 @@ AzureActivity
 | project-away count_
 ```
 
-TBD - create alert
+You can use Azure Alert capability to make such query on schedule basis and react on any resources with failed deny policies. 
+
+Let's check every day.
+
+![](img6.png)
+
+You can react on event by sending email or running any complex workflow with Logic App, Azure Functions and other options.
+
+![](img7.png)
 
 ### Resource move visibility
 Resource move operation is visible in Activity Log as write operation. Connect Activity log to Log Analytics so we can query events and provide information such as resource moves over time, who initiate those, source, destination, statistics. For resource move we need Administrative log type.
