@@ -100,13 +100,16 @@ Connect Activity log to Log Analytics workspace so we can query events and find 
 
 List failed policies with deny effect initiated not by user, but by compliance check engine (this will exclude resources blocked by deny policy).
 
-**Work in progress** - todo streamline output, deduplicate, test
 ```
 AzureActivity
 | where OperationNameValue == "MICROSOFT.AUTHORIZATION/POLICIES/DENY/ACTION"
 | extend properties = parsejson(Properties)
 | where properties.category == "Policy" and properties.isComplianceCheck == "True"
-| where parsejson(tostring(properties.policies))[0].policyDefinitionEffect == "deny"
+| extend policy = parsejson(tostring(properties.policies))[0]
+| where policy.policyDefinitionEffect == "deny"
+| extend resource =  trim_end("/default", tostring(properties.resource))
+| summarize count() by resource, ResourceGroup, ResourceProviderValue, policyDefinition = tostring(policy.policyDefinitionName), policyAssignment = tostring(policy.policyAssignmentName)
+| project-away count_
 ```
 
 TBD - create alert
